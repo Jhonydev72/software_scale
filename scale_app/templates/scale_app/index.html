@@ -1,0 +1,114 @@
+<!-- scale_app/templates/scale_app/index.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCALE - Cálculo Emergético</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'scale_app/style.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🌱 SCALE - Cálculo de Emergia</h1>
+        <p>Software for CALculating Emergy based on Life Cycle Inventories</p>
+    </div>
+
+    <div class="card">
+        <h2>📂 Importar dados LCI (CSV ou Excel)</h2>
+        <input type="file" id="lciFile" accept=".csv,.xls,.xlsx">
+        <button id="importBtn">Importar</button>
+        <div id="importMessage" class="message"></div>
+    </div>
+
+    <div class="card">
+        <h2>🔢 Calcular emergia</h2>
+        <input type="number" id="productId" placeholder="ID do produto final" value="1">
+        <button id="calcBtn">Calcular Emergia</button>
+        <div id="resultArea" class="result-box" style="display: none;"></div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Processos cadastrados</h2>
+        <div id="processTableContainer">Carregando...</div>
+    </div>
+</div>
+
+<script>
+    function showMessage(elementId, text, isError = false) {
+        const el = document.getElementById(elementId);
+        el.textContent = text;
+        el.style.color = isError ? '#c62828' : '#2e7d32';
+        el.style.backgroundColor = isError ? '#ffebee' : '#e8f5e9';
+        setTimeout(() => { if (el.id !== 'resultArea') el.textContent = ''; }, 4000);
+    }
+
+    async function loadProcesses() {
+        try {
+            const resp = await fetch('/api/processes/');
+            const processes = await resp.json();
+            const container = document.getElementById('processTableContainer');
+            if (!processes.length) {
+                container.innerHTML = '<p>Nenhum processo cadastrado. Importe dados.</p>';
+                return;
+            }
+            let html = '<table><thead><tr><th>ID</th><th>Nome</th><th>Descrição</th></tr></thead><tbody>';
+            processes.forEach(p => {
+                html += `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.description || '-'}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch (err) {
+            document.getElementById('processTableContainer').innerHTML = `<p style="color:crimson">Erro: ${err.message}</p>`;
+        }
+    }
+
+    document.getElementById('importBtn').addEventListener('click', async () => {
+        const fileInput = document.getElementById('lciFile');
+        const file = fileInput.files[0];
+        if (!file) {
+            showMessage('importMessage', 'Selecione um arquivo', true);
+            return;
+        }
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const resp = await fetch('/api/upload/', { method: 'POST', body: formData });
+            const data = await resp.json();
+            if (!resp.ok) throw new Error(data.error);
+            showMessage('importMessage', data.message);
+            loadProcesses();
+        } catch (err) {
+            showMessage('importMessage', `Erro: ${err.message}`, true);
+        }
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', async () => {
+        const productId = parseInt(document.getElementById('productId').value);
+        if (isNaN(productId)) {
+            showMessage('importMessage', 'ID inválido', true);
+            return;
+        }
+        const resultDiv = document.getElementById('resultArea');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = 'Calculando emergia...';
+        try {
+            const resp = await fetch('/api/calculate/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId })
+            });
+            const data = await resp.json();
+            if (!resp.ok) throw new Error(data.error);
+            resultDiv.innerHTML = `🌞 Emergia total: <strong>${data.emergy_sej.toFixed(2)} sej</strong> (solar emjoules)`;
+        } catch (err) {
+            resultDiv.innerHTML = `❌ Erro: ${err.message}`;
+            resultDiv.style.backgroundColor = '#ffebee';
+        }
+    });
+
+    loadProcesses();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testes
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Arquivos de upload (media)
+media/
+uploads/
+
+# Ambiente virtual
+venv/
+venv.bak/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.bak
+
+# Sistema operacional
+Thumbs.db
+desktop.ini
+
+# Arquivos sensíveis
+.env
+*.key
+*.pem
+
+# Backups
+*.backup
+*.old
