@@ -1,122 +1,223 @@
-from django.shortcuts import render
-
-# Create your views here.
 import json
 import pandas as pd
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
 from .models import Process, Flow, EmergySource
 
+
 # ============================================================
-# FUNÇÃO INDEX - É ESTA QUE ESTÁ FALTANDO NO SEU ARQUIVO
+# INDEX
 # ============================================================
 def index(request):
-    """Página inicial - renderiza o template HTML"""
     return render(request, 'scale_app/index.html')
-# ============================================================
 
+
+# ============================================================
+# LISTAR PROCESSOS
+# ============================================================
 def list_processes(request):
-    """Lista todos os processos em JSON"""
     processes = Process.objects.values('id', 'name', 'description')
     return JsonResponse(list(processes), safe=False)
 
+
+# ============================================================
+# FUNÇÕES AUXILIARES (ANTI-ERRO)
+# ============================================================
+def safe_float(value):
+    """Evita erro de NULL / NaN vindo do Excel"""
+    try:
+        if pd.isna(value):
+            return 0.0
+        return float(value)
+    except:
+        return 0.0
+
+
+# ============================================================
+# UPLOAD LCI FINAL ROBUSTO
+# ============================================================
 @csrf_exempt
 def upload_lci(request):
-    """Importa arquivo CSV ou Excel e popula o banco de dados"""
-    if request.method == 'POST' and request.FILES.get('file'):
-        uploaded_file = request.FILES['file']
-        file_name = uploaded_file.name
-        extension = file_name.split('.')[-1].lower()
-        
-        # Limpar dados antigos
-        Flow.objects.all().delete()
-        EmergySource.objects.all().delete()
-        Process.objects.all().delete()
-        
-        try:
-            if extension == 'csv':
-                df = pd.read_csv(uploaded_file)
-                # Separar os dados pelo campo 'tipo'
-                processes_df = df[df['tipo'] == 'processo']
-                flows_df = df[df['tipo'] == 'fluxo']
-                sources_df = df[df['tipo'] == 'fonte']
-                
-            elif extension in ['xls', 'xlsx']:
-                xl = pd.ExcelFile(uploaded_file)
-                processes_df = pd.read_excel(xl, 'processos')
-                flows_df = pd.read_excel(xl, 'fluxos')
-                sources_df = pd.read_excel(xl, 'fontes')
-            else:
-                return JsonResponse({'error': 'Formato não suportado. Use .csv, .xls ou .xlsx'}, status=400)
-            
-            # Inserir processos
-            for _, row in processes_df.iterrows():
-                Process.objects.create(
-                    id=row['id'],
-                    name=row['nome'],
-                    description=row.get('descricao', '')
-                )
-            
-            # Inserir fluxos
-            for _, row in flows_df.iterrows():
-                Flow.objects.create(
-                    from_process_id=row['from_process_id'],
-                    to_process_id=row['to_process_id'],
-                    amount=row['amount'],
-                    unit=row.get('unit', '')
-                )
-            
-            # Inserir fontes emergéticas
-            for _, row in sources_df.iterrows():
-                EmergySource.objects.create(
-                    process_id=row['process_id'],
-                    source_name=row['source_name'],
-                    transformity=row['transformity'],
-                    amount=row['amount'],
-                    unit=row.get('unit', '')
-                )
-            
-            return JsonResponse({'message': 'Dados importados com sucesso!', 'processos': len(processes_df)})
-        
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    
-    return JsonResponse({'error': 'Nenhum arquivo enviado'}, status=400)
 
+    if request.method != 'POST' or not request.FILES.get('file'):
+        return JsonResponse({'error': 'Nenhum arquivo enviado'}, status=400)
+
+    uploaded_file = request.FILES['file']
+    extension = uploaded_file.name.split('.')[-1].lower()
+
+    # limpar banco
+    Flow.objects.all().delete()
+    EmergySource.objects.all().delete()
+    Process.objects.all().delete()
+
+    try:
+        flows_df = None
+        sources_df = None
+
+        # =========================
+        # CSV
+        # =========================
+        if extension == 'csv':
+            df = pd.read_csv(uploaded_file)
+            df.columns = [c.lower().strip() for c in df.columns]
+            flows_df = df
+
+        # =========================
+        # EXCEL
+        # =========================
+        elif extension in ['xls', 'xlsx']:
+            xl = pd.ExcelFile(uploaded_file)
+
+            print("ABAS:", xl.sheet_names)
+
+            for sheet in xl.sheet_names:
+                temp_df = pd.read_excel(xl, sheet)
+                temp_df.columns = [str(c).lower().strip() for c in temp_df.columns]
+
+                cols = temp_df.columns.tolist()
+
+                print("\nABA:", sheet)
+                print("COLUNAS:", cols)
+
+                # =====================
+                # FLUXOS (SEU FORMATO REAL)
+                # =====================
+                if flows_df is None:
+                    if (
+                        'processo_destino_id' in cols and
+                        'insumo_fluxo' in cols and
+                        'quantidade' in cols
+                    ):
+                        flows_df = temp_df
+
+                # =====================
+                # FONTES
+                # =====================
+                if sources_df is None:
+                    if (
+                        'uev_valor' in cols or
+                        'transformity' in cols
+                    ):
+                        sources_df = temp_df
+
+        else:
+            return JsonResponse(
+                {'error': 'Formato não suportado (use csv, xls ou xlsx)'},
+                status=400
+            )
+
+        # =========================
+        # VALIDAÇÃO
+        # =========================
+        if flows_df is None:
+            return JsonResponse({'error': 'Tabela de fluxos não encontrada'}, status=400)
+
+        # =========================
+        # GERAR PROCESSOS AUTOMATICAMENTE
+        # =========================
+        process_ids = pd.unique(
+            flows_df[['id', 'processo_destino_id']].values.ravel()
+        )
+        process_ids = [p for p in process_ids if pd.notna(p)]
+
+        processes_df = pd.DataFrame({
+            'id': process_ids,
+            'nome': process_ids
+        })
+
+        # =========================
+        # SALVAR PROCESSOS
+        # =========================
+        for _, row in processes_df.iterrows():
+            Process.objects.create(
+                id=row['id'],
+                name=row['nome'],
+                description=''
+            )
+
+        # =========================
+        # SALVAR FLUXOS
+        # =========================
+        for _, row in flows_df.iterrows():
+            Flow.objects.create(
+                from_process_id=row.get('id'),
+                to_process_id=row.get('processo_destino_id'),
+                amount=safe_float(row.get('quantidade')),
+                unit=row.get('unidade', '')
+            )
+
+        # =========================
+        # SALVAR FONTES (SEM ERRO DE NULL)
+        # =========================
+        if sources_df is not None:
+            for _, row in sources_df.iterrows():
+
+                transformity = safe_float(
+                    row.get('uev_valor') or row.get('transformity')
+                )
+
+                amount = safe_float(row.get('quantidade'))
+
+                EmergySource.objects.create(
+                    process_id=row.get('id'),
+                    source_name=row.get('insumo_fluxo', 'fonte'),
+                    transformity=transformity,
+                    amount=amount,
+                    unit=row.get('unidade', '')
+                )
+
+        return JsonResponse({
+            'message': 'Importação concluída com sucesso!',
+            'processos': len(processes_df)
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+# ============================================================
+# CALCULO EMERGIA
+# ============================================================
 @csrf_exempt
 def calculate_api(request):
-    """Calcula emergia para um produto (versão simplificada)"""
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            product_id = data.get('productId')
-            if not product_id:
-                return JsonResponse({'error': 'productId é obrigatório'}, status=400)
-            
-            # Calcular emergia de forma recursiva
-            result = calculate_emergy(product_id)
-            return JsonResponse(result)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    
-    return JsonResponse({'error': 'Método não permitido. Use POST.'}, status=405)
 
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        product_id = data.get('productId')
+
+        if not product_id:
+            return JsonResponse({'error': 'productId é obrigatório'}, status=400)
+
+        return JsonResponse(calculate_emergy(product_id))
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+# ============================================================
+# EMERGIA RECURSIVA
+# ============================================================
 def calculate_emergy(product_id):
-    """Função recursiva para calcular emergia total de um produto"""
-    # Buscar fontes emergéticas diretas do processo
+
     sources = EmergySource.objects.filter(process_id=product_id)
-    total = 0
-    for source in sources:
-        total += source.amount * source.transformity
-    
-    # Buscar fluxos de entrada (de outros processos para este)
-    incoming_flows = Flow.objects.filter(to_process_id=product_id)
-    for flow in incoming_flows:
-        # Calcular emergia do processo upstream
-        upstream_emergy = calculate_emergy(flow.from_process_id)['emergy_sej']
-        total += upstream_emergy * flow.amount
-    
+
+    total = sum(
+        (s.amount or 0) * (s.transformity or 0)
+        for s in sources
+    )
+
+    flows = Flow.objects.filter(to_process_id=product_id)
+
+    for f in flows:
+        upstream = calculate_emergy(f.from_process_id)['emergy_sej']
+        total += upstream * (f.amount or 0)
+
     return {
         'productId': product_id,
         'emergy_sej': float(total),
