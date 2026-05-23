@@ -1,114 +1,674 @@
-<!-- scale_app/templates/scale_app/index.html -->
+{% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html class="light" lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCALE - Cálculo Emergético</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'scale_app/style.css' %}">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SCALE — Cálculo de Emergia</title>
+<meta name="description" content="SCALE - Software for CALculating Emergy based on Life Cycle Inventories. Calcule a emergia total dos seus produtos com base em inventários do ciclo de vida.">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "secondary-fixed-dim": "#96d5a3",
+                    "surface-container-highest": "#d9e3f7",
+                    "primary-fixed-dim": "#62df7d",
+                    "on-primary-fixed-variant": "#005320",
+                    "tertiary": "#466252",
+                    "surface-bright": "#f9f9ff",
+                    "primary-container": "#00873a",
+                    "tertiary-container": "#5e7b6a",
+                    "on-secondary-fixed-variant": "#12512c",
+                    "tertiary-fixed": "#caead6",
+                    "secondary-fixed": "#b1f2be",
+                    "on-error": "#ffffff",
+                    "surface": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-container": "#f6fff6",
+                    "surface-container-low": "#eff3ff",
+                    "on-primary-fixed": "#002109",
+                    "surface-container": "#e6eeff",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#273140",
+                    "primary-fixed": "#7ffc97",
+                    "on-secondary-fixed": "#00210d",
+                    "on-surface": "#121c2a",
+                    "on-primary-container": "#f7fff2",
+                    "surface-variant": "#d9e3f7",
+                    "surface-container-high": "#dee9fd",
+                    "on-background": "#121c2a",
+                    "on-secondary-container": "#347047",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#ebf1ff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "background": "#f9f9ff",
+                    "secondary-container": "#b1f2be",
+                    "secondary": "#2e6a41",
+                    "inverse-primary": "#62df7d",
+                    "surface-tint": "#006e2d",
+                    "primary": "#006b2c",
+                    "on-tertiary-fixed-variant": "#314d3e",
+                    "outline-variant": "#bdcaba",
+                    "tertiary-fixed-dim": "#afceba",
+                    "surface-dim": "#d0daef",
+                    "on-surface-variant": "#3e4a3d",
+                    "outline": "#6e7b6c",
+                    "on-tertiary-fixed": "#042014",
+                    "on-primary": "#ffffff"
+                },
+                "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+                "spacing": {
+                    "md": "16px",
+                    "gutter": "24px",
+                    "lg": "24px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "xs": "4px",
+                    "margin-desktop": "40px"
+                },
+                "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-md": ["JetBrains Mono"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "label-sm": ["JetBrains Mono"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"]
+                },
+                "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .surface-card {
+        background-color: #ffffff;
+        border-left: 4px solid #16A34A;
+        box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);
+    }
+    body {
+        background-color: #F0FDF4;
+    }
+    /* Spinner animation for loading states */
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+    /* Sidebar smooth transition */
+    #sidebar {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
+    #sidebar.sidebar-collapsed {
+        transform: translateX(-100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+    #main-content {
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* Dropzone drag-over highlight */
+    #dropzone-label.drag-over {
+        background-color: #b1f2be !important;
+        border-color: #006b2c !important;
+        border-style: dashed;
+        box-shadow: 0 0 0 3px rgba(0, 107, 44, 0.15);
+    }
+</style>
+<style>
+    body {
+        min-height: max(884px, 100dvh);
+    }
+</style>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>🌱 SCALE - Cálculo de Emergia</h1>
-        <p>Software for CALculating Emergy based on Life Cycle Inventories</p>
-    </div>
+<body class="min-h-screen text-on-surface font-body-md">
 
-    <div class="card">
-        <h2>📂 Importar dados LCI (CSV ou Excel)</h2>
-        <input type="file" id="lciFile" accept=".csv,.xls,.xlsx">
-        <button id="importBtn">Importar</button>
-        <div id="importMessage" class="message"></div>
+<!-- Top Navigation -->
+<nav class="bg-surface-bright border-b border-outline-variant shadow-sm sticky top-0 z-50">
+    <div class="flex items-center justify-between px-margin-mobile md:px-margin-desktop py-md w-full max-w-[1440px] mx-auto">
+        <div class="flex items-center gap-sm">
+            <button id="sidebar-toggle" class="hidden lg:flex items-center justify-center w-10 h-10 rounded-lg text-primary hover:bg-surface-container-high active:scale-90 transition-all duration-200" title="Abrir/Fechar menu lateral">
+                <span class="material-symbols-outlined text-2xl" id="sidebar-toggle-icon">menu_open</span>
+            </button>
+            <span class="material-symbols-outlined text-primary text-3xl" data-icon="eco">eco</span>
+            <span class="font-headline-lg text-headline-lg font-bold text-primary">SCALE — Cálculo de Emergia</span>
+        </div>
+        <div class="hidden md:flex items-center gap-xl">
+            <span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:scale-95 duration-200" data-icon="account_circle">account_circle</span>
+        </div>
+        <button class="md:hidden material-symbols-outlined" data-icon="menu">menu</button>
     </div>
+</nav>
 
-    <div class="card">
-        <h2>🔢 Calcular emergia</h2>
-        <input type="number" id="productId" placeholder="ID do produto final" value="1">
-        <button id="calcBtn">Calcular Emergia</button>
-        <div id="resultArea" class="result-box" style="display: none;"></div>
-    </div>
+<div class="flex max-w-[1440px] mx-auto w-full">
 
-    <div class="card">
-        <h2>📋 Processos cadastrados</h2>
-        <div id="processTableContainer">Carregando...</div>
-    </div>
+    <!-- Sidebar Navigation (Desktop) -->
+    <aside id="sidebar" class="hidden lg:flex flex-col pt-xl h-[calc(100vh-80px)] w-64 fixed left-0 border-r border-outline-variant bg-surface">
+        <div class="px-lg mb-xl">
+            <h2 class="font-headline-md text-headline-md text-primary">CALculating Emergy</h2>
+        </div>
+        <nav class="space-y-sm">
+            <div class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-r-full py-md px-lg border-l-4 border-primary cursor-pointer">
+                <span class="material-symbols-outlined" data-icon="upload_file">upload_file</span>
+                <span class="font-label-md text-label-md">Importação LCI</span>
+            </div>
+            <div class="flex items-center gap-md text-on-surface-variant py-md px-lg hover:bg-surface-container-high transition-all cursor-pointer">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="font-label-md text-label-md">Dashboard</span>
+            </div>
+        </nav>
+        <nav class="mt-auto mb-lg space-y-sm">
+            <div class="flex items-center gap-md text-on-surface-variant py-md px-lg hover:bg-surface-container-high transition-all cursor-pointer">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                <span class="font-label-md text-label-md">Configurações</span>
+            </div>
+            <div class="flex items-center gap-md text-on-surface-variant py-md px-lg hover:bg-surface-container-high transition-all cursor-pointer">
+                <span class="material-symbols-outlined" data-icon="logout">logout</span>
+                <span class="font-label-md text-label-md">Sair</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1 w-full lg:ml-64 px-margin-mobile md:px-margin-desktop py-xl">
+        <div class="max-w-6xl mx-auto space-y-xl">
+
+            <!-- Header -->
+            <header class="mb-xl">
+                <h1 class="font-display-lg text-display-lg text-on-background mb-sm">🌱 Importação LCI</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Software for CALculating Emergy based on Life Cycle Inventories</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                <div class="flex flex-col gap-gutter lg:col-span-1">
+
+                    <!-- Card 1: Import -->
+                    <section class="surface-card p-lg rounded-lg">
+                        <div class="flex items-center gap-sm mb-md">
+                            <span class="material-symbols-outlined text-primary" data-icon="folder_open">folder_open</span>
+                            <h3 class="font-headline-md text-headline-md">📂 Importar dados LCI (CSV ou Excel)</h3>
+                        </div>
+                        <div class="space-y-md">
+                            <div class="relative">
+                                <label class="block font-label-md text-label-md mb-xs text-on-surface-variant">Selecione o arquivo de inventário</label>
+                                <div class="flex items-center justify-center w-full">
+                                    <label id="dropzone-label" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-outline-variant rounded-lg cursor-pointer bg-surface hover:bg-surface-container transition-colors">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <span class="material-symbols-outlined text-outline mb-2" data-icon="cloud_upload">cloud_upload</span>
+                                            <p class="mb-2 text-sm text-on-surface-variant"><span class="font-semibold">Clique para enviar</span> ou arraste</p>
+                                            <p class="text-xs text-on-surface-variant">CSV, XLSX (Max 10MB)</p>
+                                        </div>
+                                        <input class="hidden" id="dropzone-file" type="file" accept=".csv,.xls,.xlsx">
+                                    </label>
+                                </div>
+                                <div class="mt-xs text-label-sm text-primary font-label-sm min-h-[16px]" id="file-status"></div>
+                            </div>
+
+                            <button id="btn-import" class="w-full bg-primary text-on-primary font-bold py-md px-lg rounded-lg hover:bg-[#005320] transition-colors active:scale-95 duration-200 flex items-center justify-center gap-sm">
+                                <span class="material-symbols-outlined" data-icon="file_upload">file_upload</span>
+                                Importar
+                            </button>
+
+                            <!-- Download Template Link -->
+                            <a href="{% url 'download_template' %}" class="flex items-center justify-center gap-xs text-sm text-primary hover:text-[#005320] underline underline-offset-4 decoration-1 transition-colors">
+                                <span class="material-symbols-outlined text-base" data-icon="download">download</span>
+                                Descarregar Planilha Modelo
+                            </a>
+
+                            <div class="hidden p-md rounded-lg font-body-md" id="import-msg"></div>
+                        </div>
+                    </section>
+
+                    <!-- Card 2: Calculate -->
+                    <section class="surface-card p-lg rounded-lg">
+                        <div class="flex items-center gap-sm mb-md">
+                            <span class="material-symbols-outlined text-primary" data-icon="analytics">analytics</span>
+                            <h3 class="font-headline-md text-headline-md">🧮 Calcular emergia</h3>
+                        </div>
+                        <div class="space-y-md">
+                            <div>
+                                <label class="block font-label-md text-label-md mb-xs text-on-surface-variant" for="product-id">ID do produto final</label>
+                                <input class="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-2 focus:ring-secondary-container rounded-lg p-md font-body-md transition-all outline-none" id="product-id" placeholder="Ex: 100" type="text">
+                            </div>
+                            <button id="btn-calculate" class="w-full bg-primary text-on-primary font-bold py-md px-lg rounded-lg hover:bg-[#005320] transition-colors active:scale-95 duration-200 flex items-center justify-center gap-sm">
+                                <span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+                                Calcular Emergia
+                            </button>
+                            <div class="hidden p-md rounded-lg font-body-md" id="calc-error-msg"></div>
+                            <div class="hidden p-lg rounded-lg border border-primary bg-on-tertiary-container shadow-sm space-y-sm" id="result-box">
+                                <div class="flex justify-between items-center border-b border-outline-variant pb-xs">
+                                    <span class="font-label-md text-label-md uppercase text-primary">Resultado Final</span>
+                                    <span class="material-symbols-outlined text-primary" data-icon="verified">verified</span>
+                                </div>
+                                <div class="flex items-baseline gap-xs">
+                                    <span class="font-headline-lg text-headline-lg text-primary" id="result-value">--</span>
+                                    <span class="font-label-sm text-label-sm text-on-surface-variant">sej/unit</span>
+                                </div>
+                                <p class="text-sm text-on-surface-variant italic">Cálculo baseado em transformidades globais 2024.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <!-- Card 3: Table -->
+                    <section class="surface-card p-lg rounded-lg overflow-hidden h-full">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-lg gap-md">
+                            <div class="flex items-center gap-sm">
+                                <span class="material-symbols-outlined text-primary" data-icon="list_alt">list_alt</span>
+                                <h3 class="font-headline-md text-headline-md">📋 Processos cadastrados</h3>
+                            </div>
+                            <div class="flex gap-sm">
+                                <span id="process-count-badge" class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full text-label-sm font-label-sm">0 Ativos</span>
+                                <span class="bg-surface-container-high text-on-surface-variant px-sm py-xs rounded-full text-label-sm font-label-sm">Sistema: Base Nacional</span>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-[#12512c] text-white">
+                                        <th class="p-md font-label-md text-label-md first:rounded-tl-lg">ID</th>
+                                        <th class="p-md font-label-md text-label-md">Nome</th>
+                                        <th class="p-md font-label-md text-label-md last:rounded-tr-lg">Descrição</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="processes-tbody" class="font-body-md divide-y divide-outline-variant">
+                                    <tr>
+                                        <td colspan="3" class="p-lg text-center text-on-surface-variant italic">Carregando processos...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mt-xl">
+                <div class="bg-surface-container p-md rounded-xl flex items-center gap-md">
+                    <div class="bg-primary-container p-sm rounded-lg text-white">
+                        <span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+                    </div>
+                    <div>
+                        <div class="text-label-sm font-label-sm text-on-surface-variant">Eficiência Média</div>
+                        <div class="text-headline-md font-headline-md">74.2%</div>
+                    </div>
+                </div>
+                <div class="bg-surface-container p-md rounded-xl flex items-center gap-md">
+                    <div class="bg-tertiary-container p-sm rounded-lg text-white">
+                        <span class="material-symbols-outlined" data-icon="nature">nature</span>
+                    </div>
+                    <div>
+                        <div class="text-label-sm font-label-sm text-on-surface-variant">Renovabilidade</div>
+                        <div class="text-headline-md font-headline-md">61.5%</div>
+                    </div>
+                </div>
+                <div class="bg-surface-container p-md rounded-xl flex items-center gap-md">
+                    <div class="bg-inverse-surface p-sm rounded-lg text-white">
+                        <span class="material-symbols-outlined" data-icon="history">history</span>
+                    </div>
+                    <div>
+                        <div class="text-label-sm font-label-sm text-on-surface-variant">Último Cálculo</div>
+                        <div id="last-calc-time" class="text-headline-md font-headline-md">—</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
 </div>
 
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant mt-xl">
+    <div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop py-lg w-full max-w-[1440px] mx-auto gap-md">
+        <div class="flex flex-col items-center md:items-start">
+            <span class="font-label-md text-label-md font-bold text-primary">SCALE — Ecological Sustainability</span>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 SCALE - Ecological Sustainability Software</p>
+        </div>
+        <div class="flex gap-xl">
+            <a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#"></a>
+            <a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#"></a>
+            <a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#"></a>
+        </div>
+    </div>
+</footer>
+
 <script>
-    function showMessage(elementId, text, isError = false) {
-        const el = document.getElementById(elementId);
-        el.textContent = text;
-        el.style.color = isError ? '#c62828' : '#2e7d32';
-        el.style.backgroundColor = isError ? '#ffebee' : '#e8f5e9';
-        setTimeout(() => { if (el.id !== 'resultArea') el.textContent = ''; }, 4000);
+    // ============================================================
+    // DOM References
+    // ============================================================
+    const fileInput      = document.getElementById('dropzone-file');
+    const fileStatus     = document.getElementById('file-status');
+    const btnImport      = document.getElementById('btn-import');
+    const importMsg      = document.getElementById('import-msg');
+    const btnCalculate   = document.getElementById('btn-calculate');
+    const productIdInput = document.getElementById('product-id');
+    const resultBox      = document.getElementById('result-box');
+    const resultValue    = document.getElementById('result-value');
+    const calcErrorMsg   = document.getElementById('calc-error-msg');
+    const processesTbody = document.getElementById('processes-tbody');
+    const processCountBadge = document.getElementById('process-count-badge');
+    const lastCalcTime   = document.getElementById('last-calc-time');
+
+    // ============================================================
+    // File Selection Feedback
+    // ============================================================
+    fileInput.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            fileStatus.textContent = `Arquivo selecionado: ${file.name}`;
+        } else {
+            fileStatus.textContent = '';
+        }
+    });
+
+    // ============================================================
+    // Upload / Import Logic
+    // ============================================================
+    btnImport.addEventListener('click', async function () {
+        const file = fileInput.files[0];
+
+        if (!file) {
+            showImportMsg('Selecione um arquivo antes de importar.', 'error');
+            return;
+        }
+
+        // Show processing state
+        btnImport.disabled = true;
+        btnImport.classList.add('opacity-60', 'cursor-not-allowed');
+        showImportMsg(
+            '<span class="flex items-center gap-xs">' +
+            '<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span>' +
+            ' A processar...</span>',
+            'processing'
+        );
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/api/upload-lci/', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showImportMsg(
+                    '<span class="flex items-center gap-xs">' +
+                    '<span class="material-symbols-outlined text-sm">check_circle</span> ' +
+                    (data.message || 'Importação concluída com sucesso!') +
+                    (data.processos ? ` (${data.processos} processos)` : '') +
+                    '</span>',
+                    'success'
+                );
+                // Refresh the processes table after successful upload
+                loadProcesses();
+            } else {
+                showImportMsg(
+                    '<span class="flex items-center gap-xs">' +
+                    '<span class="material-symbols-outlined text-sm">error</span> ' +
+                    (data.error || 'Erro desconhecido ao importar.') +
+                    '</span>',
+                    'error'
+                );
+            }
+        } catch (err) {
+            showImportMsg(
+                '<span class="flex items-center gap-xs">' +
+                '<span class="material-symbols-outlined text-sm">wifi_off</span> ' +
+                'Erro de conexão com o servidor.' +
+                '</span>',
+                'error'
+            );
+        } finally {
+            btnImport.disabled = false;
+            btnImport.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
+    });
+
+    /**
+     * Shows a styled message in the import feedback area.
+     * @param {string} html  – Inner HTML content
+     * @param {'success'|'error'|'processing'} type
+     */
+    function showImportMsg(html, type) {
+        importMsg.classList.remove('hidden',
+            'bg-secondary-container', 'text-on-secondary-container',
+            'bg-primary-container', 'text-white',
+            'bg-error-container', 'text-on-error-container',
+            'animate-pulse'
+        );
+
+        if (type === 'success') {
+            importMsg.classList.add('bg-primary-container', 'text-white');
+        } else if (type === 'error') {
+            importMsg.classList.add('bg-error-container', 'text-on-error-container');
+        } else {
+            importMsg.classList.add('bg-secondary-container', 'text-on-secondary-container', 'animate-pulse');
+        }
+
+        importMsg.innerHTML = html;
     }
 
+    // ============================================================
+    // Load Processes Table
+    // ============================================================
     async function loadProcesses() {
         try {
-            const resp = await fetch('/api/processes/');
-            const processes = await resp.json();
-            const container = document.getElementById('processTableContainer');
-            if (!processes.length) {
-                container.innerHTML = '<p>Nenhum processo cadastrado. Importe dados.</p>';
+            const response = await fetch('/api/processes/');
+            const processes = await response.json();
+
+            processCountBadge.textContent = `${processes.length} Ativo${processes.length !== 1 ? 's' : ''}`;
+
+            if (processes.length === 0) {
+                processesTbody.innerHTML =
+                    '<tr>' +
+                    '<td colspan="3" class="p-lg text-center text-on-surface-variant italic">' +
+                    'Nenhum processo cadastrado. Importe um arquivo LCI para começar.' +
+                    '</td></tr>';
                 return;
             }
-            let html = '<table><thead><tr><th>ID</th><th>Nome</th><th>Descrição</th></tr></thead><tbody>';
-            processes.forEach(p => {
-                html += `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.description || '-'}</td></tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
+
+            processesTbody.innerHTML = processes.map(function (p, i) {
+                const bgClass = i % 2 === 0 ? 'bg-white' : 'bg-[#F0FDF4]';
+                return '<tr class="' + bgClass + ' hover:bg-surface-container transition-colors">' +
+                    '<td class="p-md font-label-md text-primary">' + escapeHtml(String(p.id)) + '</td>' +
+                    '<td class="p-md font-bold">' + escapeHtml(p.name || '—') + '</td>' +
+                    '<td class="p-md text-on-surface-variant">' + escapeHtml(p.description || '—') + '</td>' +
+                    '</tr>';
+            }).join('');
         } catch (err) {
-            document.getElementById('processTableContainer').innerHTML = `<p style="color:crimson">Erro: ${err.message}</p>`;
+            processesTbody.innerHTML =
+                '<tr>' +
+                '<td colspan="3" class="p-lg text-center text-error italic">' +
+                'Erro ao carregar processos.' +
+                '</td></tr>';
         }
     }
 
-    document.getElementById('importBtn').addEventListener('click', async () => {
-        const fileInput = document.getElementById('lciFile');
-        const file = fileInput.files[0];
-        if (!file) {
-            showMessage('importMessage', 'Selecione um arquivo', true);
-            return;
-        }
-        const formData = new FormData();
-        formData.append('file', file);
-        try {
-            const resp = await fetch('/api/upload/', { method: 'POST', body: formData });
-            const data = await resp.json();
-            if (!resp.ok) throw new Error(data.error);
-            showMessage('importMessage', data.message);
-            loadProcesses();
-        } catch (err) {
-            showMessage('importMessage', `Erro: ${err.message}`, true);
-        }
-    });
+    // ============================================================
+    // Calculate Emergy
+    // ============================================================
+    btnCalculate.addEventListener('click', async function () {
+        const productId = productIdInput.value.trim();
 
-    document.getElementById('calcBtn').addEventListener('click', async () => {
-        const productId = parseInt(document.getElementById('productId').value);
-        if (isNaN(productId)) {
-            showMessage('importMessage', 'ID inválido', true);
+        // Hide previous results / errors
+        resultBox.classList.add('hidden');
+        calcErrorMsg.classList.add('hidden');
+
+        if (!productId) {
+            showCalcError('Informe o ID do produto para calcular.');
             return;
         }
-        const resultDiv = document.getElementById('resultArea');
-        resultDiv.style.display = 'block';
-        resultDiv.innerHTML = 'Calculando emergia...';
+
+        btnCalculate.disabled = true;
+        btnCalculate.classList.add('opacity-60', 'cursor-not-allowed');
+
         try {
-            const resp = await fetch('/api/calculate/', {
+            const response = await fetch('/api/calculate/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId })
+                body: JSON.stringify({ productId: productId })
             });
-            const data = await resp.json();
-            if (!resp.ok) throw new Error(data.error);
-            resultDiv.innerHTML = `🌞 Emergia total: <strong>${data.emergy_sej.toFixed(2)} sej</strong> (solar emjoules)`;
+
+            const data = await response.json();
+
+            if (response.ok && data.emergy_sej !== undefined) {
+                resultValue.textContent = formatEmergy(data.emergy_sej);
+                resultBox.classList.remove('hidden');
+                lastCalcTime.textContent = 'Agora';
+            } else {
+                showCalcError(data.error || 'Não foi possível calcular a emergia.');
+            }
         } catch (err) {
-            resultDiv.innerHTML = `❌ Erro: ${err.message}`;
-            resultDiv.style.backgroundColor = '#ffebee';
+            showCalcError('Erro de conexão com o servidor.');
+        } finally {
+            btnCalculate.disabled = false;
+            btnCalculate.classList.remove('opacity-60', 'cursor-not-allowed');
         }
     });
 
-    loadProcesses();
+    function showCalcError(msg) {
+        calcErrorMsg.classList.remove('hidden', 'bg-error-container', 'text-on-error-container');
+        calcErrorMsg.classList.add('bg-error-container', 'text-on-error-container');
+        calcErrorMsg.innerHTML =
+            '<span class="flex items-center gap-xs">' +
+            '<span class="material-symbols-outlined text-sm">error</span> ' +
+            escapeHtml(msg) +
+            '</span>';
+    }
+
+    // ============================================================
+    // Utility Functions
+    // ============================================================
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    function formatEmergy(value) {
+        if (value === 0) return '0 sej';
+        var exp = Math.floor(Math.log10(Math.abs(value)));
+        if (exp >= 6 || exp <= -3) {
+            return (value / Math.pow(10, exp)).toFixed(2) + ' × 10^' + exp;
+        }
+        return value.toLocaleString('pt-BR', { maximumFractionDigits: 4 });
+    }
+
+    // ============================================================
+    // Sidebar Toggle (Funcionalidade 1)
+    // ============================================================
+    (function () {
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarToggleIcon = document.getElementById('sidebar-toggle-icon');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        let sidebarOpen = true;
+
+        sidebarToggle.addEventListener('click', function () {
+            sidebarOpen = !sidebarOpen;
+
+            if (sidebarOpen) {
+                // Expand sidebar
+                sidebar.classList.remove('sidebar-collapsed');
+                mainContent.classList.add('lg:ml-64');
+                sidebarToggleIcon.textContent = 'menu_open';
+            } else {
+                // Collapse sidebar
+                sidebar.classList.add('sidebar-collapsed');
+                mainContent.classList.remove('lg:ml-64');
+                sidebarToggleIcon.textContent = 'menu';
+            }
+        });
+    })();
+
+    // ============================================================
+    // Drag and Drop Upload (Funcionalidade 2)
+    // ============================================================
+    (function () {
+        const dropzoneLabel = document.getElementById('dropzone-label');
+        let dragCounter = 0; // Track nested drag events
+
+        dropzoneLabel.addEventListener('dragenter', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter++;
+            dropzoneLabel.classList.add('drag-over');
+        });
+
+        dropzoneLabel.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzoneLabel.classList.add('drag-over');
+        });
+
+        dropzoneLabel.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                dropzoneLabel.classList.remove('drag-over');
+            }
+        });
+
+        dropzoneLabel.addEventListener('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter = 0;
+            dropzoneLabel.classList.remove('drag-over');
+
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length > 0) {
+                // Assign the dropped file to the hidden file input
+                fileInput.files = droppedFiles;
+                // Manually dispatch the 'change' event to trigger the existing feedback logic
+                fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+    })();
+
+    // ============================================================
+    // Init — Load processes on page load
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', loadProcesses);
 </script>
+
 </body>
 </html>
