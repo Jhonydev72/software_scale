@@ -154,8 +154,7 @@
     }
 </style>
 </head>
-<body class="min-h-screen text-on-surface font-body-md">
-
+<body class="min-h-screen flex flex-col text-on-surface font-body-md">
 <!-- Top Navigation -->
 <nav class="bg-surface-bright border-b border-outline-variant shadow-sm sticky top-0 z-50">
     <div class="flex items-center justify-between px-margin-mobile md:px-margin-desktop py-md w-full max-w-[1440px] mx-auto">
@@ -173,7 +172,7 @@
     </div>
 </nav>
 
-<div class="flex max-w-[1440px] mx-auto w-full">
+<div class="flex max-w-[1440px] mx-auto w-full flex-1">
 
     <!-- Sidebar Navigation (Desktop) -->
     <aside id="sidebar" class="hidden lg:flex flex-col pt-xl h-[calc(100vh-80px)] w-64 fixed left-0 border-r border-outline-variant bg-surface">
@@ -181,13 +180,28 @@
             <h2 class="font-headline-md text-headline-md text-primary">CALculating Emergy</h2>
         </div>
         <nav class="space-y-sm">
-            <div class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-r-full py-md px-lg border-l-4 border-primary cursor-pointer">
-                <span class="material-symbols-outlined" data-icon="upload_file">upload_file</span>
+            <div id="menu-importacao"
+                class="menu-item flex items-center gap-md py-md px-lg cursor-pointer
+                bg-secondary-container text-on-secondary-container rounded-r-full border-l-4 border-primary"
+                onclick="showTab('importacao', 'menu-importacao')">
+                <span class="material-symbols-outlined">upload_file</span>
                 <span class="font-label-md text-label-md">Importação LCI</span>
             </div>
-            <div class="flex items-center gap-md text-on-surface-variant py-md px-lg hover:bg-surface-container-high transition-all cursor-pointer">
-                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+
+            <div id="menu-dashboard"
+                class="menu-item flex items-center gap-md py-md px-lg cursor-pointer
+                text-on-surface-variant hover:bg-surface-container-high"
+                onclick="showTab('dashboard', 'menu-dashboard')">
+                <span class="material-symbols-outlined">dashboard</span>
                 <span class="font-label-md text-label-md">Dashboard</span>
+            </div>
+
+            <div id="menu-planilha"
+                class="menu-item flex items-center gap-md py-md px-lg cursor-pointer
+                text-on-surface-variant hover:bg-surface-container-high"
+                onclick="showTab('planilha', 'menu-planilha')">
+                <span class="material-symbols-outlined">table_view</span>
+                <span class="font-label-md text-label-md">Planilha Exemplo</span>
             </div>
         </nav>
         <nav class="mt-auto mb-lg space-y-sm">
@@ -201,11 +215,13 @@
             </div>
         </nav>
     </aside>
-
+    
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 w-full lg:ml-64 px-margin-mobile md:px-margin-desktop py-xl">
-        <div class="max-w-6xl mx-auto space-y-xl">
+    <main id="main-content" class="flex-1 w-full lg:ml-64 px-margin-mobile md:px-margin-desktop py-xl min-h-full">
 
+        <!-- TAB IMPORTAÇÃO -->
+        <div id="tab-importacao">
+            <div class="max-w-6xl mx-auto space-y-xl"> 
             <!-- Header -->
             <header class="mb-xl">
                 <h1 class="font-display-lg text-display-lg text-on-background mb-sm">🌱 Importação LCI</h1>
@@ -241,12 +257,6 @@
                                 <span class="material-symbols-outlined" data-icon="file_upload">file_upload</span>
                                 Importar
                             </button>
-
-                            <!-- Download Template Link -->
-                            <a href="{% url 'download_template' %}" class="flex items-center justify-center gap-xs text-sm text-primary hover:text-[#005320] underline underline-offset-4 decoration-1 transition-colors">
-                                <span class="material-symbols-outlined text-base" data-icon="download">download</span>
-                                Descarregar Planilha Modelo
-                            </a>
 
                             <div class="hidden p-md rounded-lg font-body-md" id="import-msg"></div>
                         </div>
@@ -348,11 +358,107 @@
             </div>
 
         </div>
+        </div> <!-- /tab-importacao -->
+
+        <!-- TAB DASHBOARD -->
+        <div id="tab-dashboard" class="hidden">
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-xl font-bold">Dashboard</h1>
+            </div>
+        </div>
+
+        <!-- TAB PLANILHA -->
+        <div id="tab-planilha" class="hidden">
+            <div class="max-w-6xl mx-auto space-y-xl">
+
+                <!-- Header -->
+                <header class="mb-xl">
+                    <h1 class="font-display-lg text-display-lg text-on-background mb-sm">
+                        📊 Planilha Exemplo LCI
+                    </h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant">
+                        Veja como estruturar corretamente seu inventário do ciclo de vida (LCI)
+                    </p>
+                </header>
+
+                <!-- Download -->
+                <section class="surface-card p-lg rounded-lg">
+                    <div class="flex items-center gap-sm mb-md">
+                        <span class="material-symbols-outlined text-primary">download</span>
+                        <h2 class="font-headline-md text-headline-md">
+                            Baixar Planilha Modelo
+                        </h2>
+                    </div>
+
+                    <a href="{% url 'download_template' %}"
+                    class="flex items-center justify-center gap-xs text-sm text-primary hover:text-[#005320] underline underline-offset-4 decoration-1 transition-colors">
+                        <span class="material-symbols-outlined text-base">download</span>
+                        Descarregar Planilha Modelo
+                    </a>
+                </section>
+
+                <!-- Explicação -->
+                <section class="surface-card p-lg rounded-lg">
+                    <h2 class="font-headline-md text-headline-md mb-md">
+                        📌 Como preencher a planilha
+                    </h2>
+
+                    <p class="text-on-surface-variant mb-md">
+                        Cada linha representa um processo do inventário LCI. Preencha corretamente os campos para garantir o cálculo correto da emergia.
+                    </p>
+
+                    <ul class="space-y-sm text-sm text-on-surface-variant">
+                        <li><b>ID:</b> Identificador único do processo (não pode repetir)</li>
+                        <li><b>Nome:</b> Nome do processo (ex: Produção de aço)</li>
+                        <li><b>Descrição:</b> Explicação do processo</li>
+                        <li><b>Entrada:</b> Recurso utilizado no processo</li>
+                        <li><b>Unidade:</b> Unidade de medida (kg, MJ, kWh, L)</li>
+                    </ul>
+                </section>
+
+                <!-- Exemplo visual -->
+                <section class="surface-card p-lg rounded-lg overflow-x-auto">
+                    <h2 class="font-headline-md text-headline-md mb-md">
+                        📊 Exemplo de estrutura da planilha
+                    </h2>
+
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-[#12512c] text-white">
+                                <th class="p-md">ID</th>
+                                <th class="p-md">Nome</th>
+                                <th class="p-md">Descrição</th>
+                                <th class="p-md">Entrada</th>
+                                <th class="p-md">Unidade</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant">
+                            <tr>
+                                <td class="p-md">1</td>
+                                <td class="p-md">Produção de aço</td>
+                                <td class="p-md">Processo industrial de aço bruto</td>
+                                <td class="p-md">Energia elétrica</td>
+                                <td class="p-md">MJ</td>
+                            </tr>
+                            <tr>
+                                <td class="p-md">2</td>
+                                <td class="p-md">Transporte</td>
+                                <td class="p-md">Transporte de materiais</td>
+                                <td class="p-md">Diesel</td>
+                                <td class="p-md">L</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+            </div>
+        </div>
+        
     </main>
 </div>
 
 <!-- Footer -->
-<footer class="bg-surface-container-lowest border-t border-outline-variant mt-xl">
+<footer class="mt-auto bg-surface-container-lowest border-t border-outline-variant">
     <div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop py-lg w-full max-w-[1440px] mx-auto gap-md">
         <div class="flex flex-col items-center md:items-start">
             <span class="font-label-md text-label-md font-bold text-primary">SCALE — Ecological Sustainability</span>
@@ -667,7 +773,56 @@
     // ============================================================
     // Init — Load processes on page load
     // ============================================================
-    document.addEventListener('DOMContentLoaded', loadProcesses);
+    document.addEventListener('DOMContentLoaded', function () {
+    loadProcesses();
+    showTab('importacao'); // <- ESSENCIAL
+});
+
+    function showTab(tab, menuId) {
+    const sections = {
+        importacao: document.getElementById('tab-importacao'),
+        dashboard: document.getElementById('tab-dashboard'),
+        planilha: document.getElementById('tab-planilha')
+    };
+
+    // esconder todas as tabs
+    Object.values(sections).forEach(s => {
+        if (s) s.classList.add('hidden');
+    });
+
+    // mostrar a atual
+    if (sections[tab]) {
+        sections[tab].classList.remove('hidden');
+    }
+
+    // resetar todos os menus
+    document.querySelectorAll('.menu-item').forEach(el => {
+        el.classList.remove(
+            'bg-secondary-container',
+            'text-on-secondary-container',
+            'border-l-4',
+            'border-primary'
+        );
+
+        el.classList.add('text-on-surface-variant');
+    });
+
+    // ativar o menu clicado
+    const active = document.getElementById(menuId);
+
+    if (active) {
+        active.classList.add(
+            'bg-secondary-container',
+            'text-on-secondary-container',
+            'border-l-4',
+            'border-primary'
+        );
+
+        active.classList.remove('text-on-surface-variant');
+    }
+}
+
+
 </script>
 
 </body>
