@@ -204,16 +204,6 @@
                 <span class="font-label-md text-label-md">Planilha Exemplo</span>
             </div>
         </nav>
-        <nav class="mt-auto mb-lg space-y-sm">
-            <div class="flex items-center gap-md text-on-surface-variant py-md px-lg hover:bg-surface-container-high transition-all cursor-pointer">
-                <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                <span class="font-label-md text-label-md">Configurações</span>
-            </div>
-            <div class="flex items-center gap-md text-on-surface-variant py-md px-lg hover:bg-surface-container-high transition-all cursor-pointer">
-                <span class="material-symbols-outlined" data-icon="logout">logout</span>
-                <span class="font-label-md text-label-md">Sair</span>
-            </div>
-        </nav>
     </aside>
     
     <!-- Main Content -->
@@ -325,45 +315,76 @@
                     </section>
                 </div>
             </div>
-
-            <!-- Stats Row -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mt-xl">
-                <div class="bg-surface-container p-md rounded-xl flex items-center gap-md">
-                    <div class="bg-primary-container p-sm rounded-lg text-white">
-                        <span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
-                    </div>
-                    <div>
-                        <div class="text-label-sm font-label-sm text-on-surface-variant">Eficiência Média</div>
-                        <div class="text-headline-md font-headline-md">74.2%</div>
-                    </div>
-                </div>
-                <div class="bg-surface-container p-md rounded-xl flex items-center gap-md">
-                    <div class="bg-tertiary-container p-sm rounded-lg text-white">
-                        <span class="material-symbols-outlined" data-icon="nature">nature</span>
-                    </div>
-                    <div>
-                        <div class="text-label-sm font-label-sm text-on-surface-variant">Renovabilidade</div>
-                        <div class="text-headline-md font-headline-md">61.5%</div>
-                    </div>
-                </div>
-                <div class="bg-surface-container p-md rounded-xl flex items-center gap-md">
-                    <div class="bg-inverse-surface p-sm rounded-lg text-white">
-                        <span class="material-symbols-outlined" data-icon="history">history</span>
-                    </div>
-                    <div>
-                        <div class="text-label-sm font-label-sm text-on-surface-variant">Último Cálculo</div>
-                        <div id="last-calc-time" class="text-headline-md font-headline-md">—</div>
-                    </div>
-                </div>
-            </div>
-
+            
         </div>
         </div> <!-- /tab-importacao -->
 
         <!-- TAB DASHBOARD -->
         <div id="tab-dashboard" class="hidden">
-            <div class="max-w-6xl mx-auto">
-                <h1 class="text-xl font-bold">Dashboard</h1>
+            <div class="max-w-6xl mx-auto space-y-xl">
+
+                <!-- Header -->
+                <header class="mb-xl">
+                    <h1 class="font-display-lg text-display-lg text-on-background mb-sm">📈 Dashboard Analítico</h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant">Visualize a distribuição emergética, processos e transformidades do seu inventário</p>
+                </header>
+
+                <!-- Control Card -->
+                <section class="surface-card p-lg rounded-lg">
+                    <div class="flex items-center gap-sm mb-md">
+                        <span class="material-symbols-outlined text-primary">tune</span>
+                        <h3 class="font-headline-md text-headline-md">🔬 Painel de Controle</h3>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-md items-end">
+                        <div class="flex-1 w-full">
+                            <label class="block font-label-md text-label-md mb-xs text-on-surface-variant" for="inventory-select">Selecione o Inventário para Análise</label>
+                            <select id="inventory-select" class="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-2 focus:ring-secondary-container rounded-lg p-md font-body-md transition-all outline-none appearance-none cursor-pointer">
+                                <option value="">— Carregando inventários... —</option>
+                            </select>
+                        </div>
+                        <button id="btn-generate-charts" class="w-full md:w-auto bg-primary text-on-primary font-bold py-md px-xl rounded-lg hover:bg-[#005320] transition-colors active:scale-95 duration-200 flex items-center justify-center gap-sm whitespace-nowrap">
+                            <span class="material-symbols-outlined" id="btn-generate-icon">analytics</span>
+                            <span id="btn-generate-text">Gerar Gráficos</span>
+                        </button>
+                    </div>
+                    <div class="hidden p-md rounded-lg font-body-md mt-md" id="dashboard-msg"></div>
+                </section>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-gutter">
+
+                    <!-- Chart 2: Bar -->
+                    <section class="surface-card p-lg rounded-lg">
+                        <div class="flex items-center gap-sm mb-md">
+                            <span class="material-symbols-outlined text-primary">bar_chart</span>
+                            <h3 class="font-headline-md text-headline-md" style="font-size:18px">Top Processos Upstream</h3>
+                        </div>
+                        <div class="relative min-h-[280px] flex items-center justify-center">
+                            <div id="placeholder-bar" class="flex flex-col items-center gap-sm text-on-surface-variant">
+                                <span class="material-symbols-outlined text-outline-variant" style="font-size:56px">bar_chart</span>
+                                <p class="text-sm italic text-center">Aguardando seleção<br>de inventário...</p>
+                            </div>
+                            <img id="chart-bar" class="w-full hidden rounded-lg cursor-pointer hover:opacity-80 transition-opacity" alt="Gráfico de barras — Emergia por processo" title="Clique para ampliar">
+                        </div>
+                    </section>
+
+                    <!-- Chart 3: Line -->
+                    <section class="surface-card p-lg rounded-lg">
+                        <div class="flex items-center gap-sm mb-md">
+                            <span class="material-symbols-outlined text-primary">show_chart</span>
+                            <h3 class="font-headline-md text-headline-md" style="font-size:18px">Curva de Transformidade UEV</h3>
+                        </div>
+                        <div class="relative min-h-[280px] flex items-center justify-center">
+                            <div id="placeholder-line" class="flex flex-col items-center gap-sm text-on-surface-variant">
+                                <span class="material-symbols-outlined text-outline-variant" style="font-size:56px">show_chart</span>
+                                <p class="text-sm italic text-center">Aguardando seleção<br>de inventário...</p>
+                            </div>
+                            <img id="chart-line" class="w-full hidden rounded-lg cursor-pointer hover:opacity-80 transition-opacity" alt="Gráfico de linhas — Valores de UEV" title="Clique para ampliar">
+                        </div>
+                    </section>
+
+                </div>
+
             </div>
         </div>
 
@@ -487,7 +508,17 @@
     const calcErrorMsg   = document.getElementById('calc-error-msg');
     const processesTbody = document.getElementById('processes-tbody');
     const processCountBadge = document.getElementById('process-count-badge');
-    const lastCalcTime   = document.getElementById('last-calc-time');
+
+    // Dashboard DOM References
+    const inventorySelect   = document.getElementById('inventory-select');
+    const btnGenerateCharts = document.getElementById('btn-generate-charts');
+    const btnGenerateIcon   = document.getElementById('btn-generate-icon');
+    const btnGenerateText   = document.getElementById('btn-generate-text');
+    const dashboardMsg      = document.getElementById('dashboard-msg');
+    const chartBar          = document.getElementById('chart-bar');
+    const chartLine         = document.getElementById('chart-line');
+    const placeholderBar    = document.getElementById('placeholder-bar');
+    const placeholderLine   = document.getElementById('placeholder-line');
 
     // ============================================================
     // File Selection Feedback
@@ -542,8 +573,9 @@
                     '</span>',
                     'success'
                 );
-                // Refresh the processes table after successful upload
+                // Refresh the processes table and inventories list after successful upload
                 loadProcesses();
+                loadInventories();
             } else {
                 showImportMsg(
                     '<span class="flex items-center gap-xs">' +
@@ -657,7 +689,6 @@
             if (response.ok && data.emergy_sej !== undefined) {
                 resultValue.textContent = formatEmergy(data.emergy_sej);
                 resultBox.classList.remove('hidden');
-                lastCalcTime.textContent = 'Agora';
             } else {
                 showCalcError(data.error || 'Não foi possível calcular a emergia.');
             }
@@ -771,10 +802,148 @@
     })();
 
     // ============================================================
+    // Dashboard — Load Inventories
+    // ============================================================
+    async function loadInventories() {
+        try {
+            const response = await fetch('/api/inventories/');
+            const inventories = await response.json();
+
+            inventorySelect.innerHTML = '';
+
+            if (inventories.length === 0) {
+                inventorySelect.innerHTML =
+                    '<option value="">— Nenhum inventário disponível —</option>';
+                return;
+            }
+
+            inventorySelect.innerHTML =
+                '<option value="">— Selecione um inventário —</option>';
+
+            inventories.forEach(function (inv) {
+                const option = document.createElement('option');
+                option.value = inv.id;
+                option.textContent = inv.name + '  (' + inv.created_at + ')';
+                inventorySelect.appendChild(option);
+            });
+        } catch (err) {
+            inventorySelect.innerHTML =
+                '<option value="">— Erro ao carregar inventários —</option>';
+        }
+    }
+
+    // ============================================================
+    // Dashboard — Generate Charts
+    // ============================================================
+    async function generateCharts() {
+        const inventoryId = inventorySelect.value;
+
+        if (!inventoryId) {
+            showDashboardMsg(
+                '<span class="flex items-center gap-xs">' +
+                '<span class="material-symbols-outlined text-sm">warning</span> ' +
+                'Selecione um inventário antes de gerar os gráficos.' +
+                '</span>',
+                'error'
+            );
+            return;
+        }
+
+        // Loading state
+        btnGenerateCharts.disabled = true;
+        btnGenerateCharts.classList.add('opacity-60', 'cursor-not-allowed');
+        btnGenerateIcon.textContent = 'progress_activity';
+        btnGenerateIcon.classList.add('animate-spin');
+        btnGenerateText.textContent = 'Gerando Gráficos...';
+
+        // Reset charts to placeholders
+        chartBar.classList.add('hidden');
+        chartLine.classList.add('hidden');
+        placeholderBar.classList.remove('hidden');
+        placeholderLine.classList.remove('hidden');
+        dashboardMsg.classList.add('hidden');
+
+        try {
+            const response = await fetch('/api/dashboard/' + inventoryId + '/');
+            const data = await response.json();
+
+            if (response.ok) {
+                // Inject bar chart
+                if (data.bar_chart) {
+                    chartBar.src = data.bar_chart;
+                    chartBar.classList.remove('hidden');
+                    placeholderBar.classList.add('hidden');
+                }
+
+                // Inject line chart
+                if (data.line_chart) {
+                    chartLine.src = data.line_chart;
+                    chartLine.classList.remove('hidden');
+                    placeholderLine.classList.add('hidden');
+                }
+
+                showDashboardMsg(
+                    '<span class="flex items-center gap-xs">' +
+                    '<span class="material-symbols-outlined text-sm">check_circle</span> ' +
+                    'Gráficos gerados com sucesso para: ' + escapeHtml(data.inventory_name || '') +
+                    '</span>',
+                    'success'
+                );
+            } else {
+                showDashboardMsg(
+                    '<span class="flex items-center gap-xs">' +
+                    '<span class="material-symbols-outlined text-sm">error</span> ' +
+                    escapeHtml(data.error || 'Erro ao gerar gráficos.') +
+                    '</span>',
+                    'error'
+                );
+            }
+        } catch (err) {
+            showDashboardMsg(
+                '<span class="flex items-center gap-xs">' +
+                '<span class="material-symbols-outlined text-sm">wifi_off</span> ' +
+                'Erro de conexão com o servidor.' +
+                '</span>',
+                'error'
+            );
+        } finally {
+            btnGenerateCharts.disabled = false;
+            btnGenerateCharts.classList.remove('opacity-60', 'cursor-not-allowed');
+            btnGenerateIcon.textContent = 'analytics';
+            btnGenerateIcon.classList.remove('animate-spin');
+            btnGenerateText.textContent = 'Gerar Gráficos';
+        }
+    }
+
+    btnGenerateCharts.addEventListener('click', generateCharts);
+
+    /**
+     * Shows a styled message in the dashboard feedback area.
+     * @param {string} html – Inner HTML content
+     * @param {'success'|'error'} type
+     */
+    function showDashboardMsg(html, type) {
+        dashboardMsg.classList.remove('hidden',
+            'bg-secondary-container', 'text-on-secondary-container',
+            'bg-primary-container', 'text-white',
+            'bg-error-container', 'text-on-error-container'
+        );
+
+        if (type === 'success') {
+            dashboardMsg.classList.add('bg-primary-container', 'text-white');
+        } else if (type === 'error') {
+            dashboardMsg.classList.add('bg-error-container', 'text-on-error-container');
+        }
+
+        dashboardMsg.innerHTML = html;
+    }
+
+    // ============================================================
     // Init — Load processes on page load
     // ============================================================
     document.addEventListener('DOMContentLoaded', function () {
     loadProcesses();
+    loadInventories();
     showTab('importacao'); // <- ESSENCIAL
 });
 
@@ -823,6 +992,62 @@
 }
 
 
+</script>
+
+<!-- Modal Tela Cheia para Gráficos -->
+<div id="chart-modal" class="fixed inset-0 z-50 hidden bg-black/90 flex items-center justify-center p-4" style="backdrop-filter: blur(4px)">
+    <button id="chart-modal-close" class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10" title="Fechar (Esc)">
+        <span class="material-symbols-outlined" style="font-size:40px">close</span>
+    </button>
+    <img id="chart-modal-img" class="max-h-full max-w-full object-contain rounded-lg shadow-2xl" alt="Gráfico ampliado">
+</div>
+
+<script>
+    // ============================================================
+    // Modal de Tela Cheia para Gráficos
+    // ============================================================
+    (function () {
+        const modal     = document.getElementById('chart-modal');
+        const modalImg  = document.getElementById('chart-modal-img');
+        const modalClose = document.getElementById('chart-modal-close');
+
+        // Abrir modal ao clicar em qualquer gráfico
+        ['chart-bar', 'chart-line'].forEach(function (id) {
+            const img = document.getElementById(id);
+            if (img) {
+                img.addEventListener('click', function () {
+                    if (img.src && !img.classList.contains('hidden')) {
+                        modalImg.src = img.src;
+                        modal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            }
+        });
+
+        // Fechar ao clicar no botão X
+        modalClose.addEventListener('click', closeModal);
+
+        // Fechar ao clicar no backdrop (fora da imagem)
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Fechar com tecla Esc
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modalImg.src = '';
+            document.body.style.overflow = '';
+        }
+    })();
 </script>
 
 </body>
