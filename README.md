@@ -37,7 +37,7 @@ Siga os passos abaixo para configurar o ambiente virtual, instalar as dependênc
 Abra o seu terminal, clone o repositório da sua branch de desenvolvimento e acesse o diretório do projeto:
 
 ```bash
-git clone [https://github.com/Jhonydev72/software_scale.git](https://github.com/Jhonydev72/software_scale.git)
+git clone https://github.com/Jhonydev72/software_scale.git
 cd software_scale
 
 ```
